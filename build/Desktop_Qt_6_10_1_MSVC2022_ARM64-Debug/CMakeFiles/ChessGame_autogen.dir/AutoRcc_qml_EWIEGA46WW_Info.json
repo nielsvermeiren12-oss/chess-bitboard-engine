@@ -1,0 +1,27 @@
+{
+	"BUILD_DIR" : "C:/Projects/ChessEngine/build/Desktop_Qt_6_10_1_MSVC2022_ARM64-Debug/ChessGame_autogen",
+	"CMAKE_BINARY_DIR" : "C:/Projects/ChessEngine/build/Desktop_Qt_6_10_1_MSVC2022_ARM64-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/Projects/ChessEngine/build/Desktop_Qt_6_10_1_MSVC2022_ARM64-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/Projects/ChessEngine",
+	"CMAKE_SOURCE_DIR" : "C:/Projects/ChessEngine",
+	"CROSS_CONFIG" : false,
+	"GENERATOR" : "Ninja",
+	"INCLUDE_DIR" : "C:/Projects/ChessEngine/build/Desktop_Qt_6_10_1_MSVC2022_ARM64-Debug/ChessGame_autogen/include",
+	"INPUTS" : 
+	[
+		"C:/Projects/ChessEngine/Square.qml",
+		"C:/Projects/ChessEngine/Board.qml",
+		"C:/Projects/ChessEngine/components/Sidebar.qml"
+	],
+	"LOCK_FILE" : "C:/Projects/ChessEngine/build/Desktop_Qt_6_10_1_MSVC2022_ARM64-Debug/CMakeFiles/ChessGame_autogen.dir/AutoRcc_qml_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "--no-zstd", "-name", "qml" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_qml.cpp",
+	"RCC_EXECUTABLE" : "C:/Qt/6.10.1/msvc2022_arm64/bin/rcc.exe",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "C:/Projects/ChessEngine/build/Desktop_Qt_6_10_1_MSVC2022_ARM64-Debug/CMakeFiles/ChessGame_autogen.dir/AutoRcc_qml_EWIEGA46WW_Used.txt",
+	"SOURCE" : "C:/Projects/ChessEngine/qml.qrc",
+	"USE_BETTER_GRAPH" : true,
+	"VERBOSITY" : 0
+}

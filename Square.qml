@@ -7,8 +7,6 @@ Rectangle {
     color: squareColour
     property int row: Math.floor(index/8);
     property int col: index % 8;
-    property string squareColour: BoardModel ? BoardModel.squares[row][col].squareColour : ""
-    property string pieceColour: BoardModel ?  BoardModel.squares[row][col].piece.pieceColour : ""
 
     Timer {
         id: timer
@@ -25,6 +23,7 @@ Rectangle {
     }
 
     function movePiece() {
+        if (!BoardModel.humanTurn || BoardModel.aiThinking) return;
         var activePieceCol = col;
         if (BoardModel && posMoveRect.visible) {
             activePieceCol = checkMakeCastlingMove();
@@ -40,7 +39,7 @@ Rectangle {
             var startTime = new Date().getTime()
             BoardModel.makeAIMove();
             boardRepeater.elapsedTime = new Date().getTime() - startTime
-            boardRepeater.checkForCheck();
+            //boardRepeater.checkForCheck();
         }, 1)
     }
 

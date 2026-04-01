@@ -1,92 +1,148 @@
 #include "minimax.h"
 
-Minimax::Minimax(QList<QList<Square *>> board) {
-    this->board = board;
+#include "boardevaluator.h"
+
+#include <domain/movegenerator.h>
+
+Minimax::Minimax(Position& position) {
+    this->m_position = position;
 }
 
-QHash<Piece *, QList<int>> Minimax::minimaxRoot(int depth) {
-    QHash<Piece *, QList<QList<int>>> newGameMoves = this->getNextMoves("black");
-    int bestMove = -9999;
-    QHash<Piece *, QList<int>> bestNextMove;
 
-    for (int i = 0; i < newGameMoves.count(); i++) {
-        for (int j = 0; j < newGameMoves.values()[i].count(); j++) {
-            Piece * pieceClone = newGameMoves.keys()[i];
-            int row = pieceClone->getRow();
-            int col = pieceClone->getCol();
 
-            Piece * capturedPiece = Game::makeMove(board, pieceClone, newGameMoves.values()[i][j]);
-            int value = minimax(depth -1, board, -100000, 100000, false);
-            Game::undoMove(board, pieceClone, capturedPiece, row, col);
+Move Minimax::minimaxRoot(int depth)
+{
+    std::vector<Move> moves = getNextMoves();
 
-            if(value >= bestMove) {
-                bestMove = value;
-                bestNextMove.clear();
-                bestNextMove.insert(pieceClone, newGameMoves.values()[i][j]);
-            }
-
-        }
+    // No legal moves (checkmate/stalemate) - caller must not apply the returned move
+    if (moves.empty()) {
+        Move dummyMove;
+        return dummyMove;
     }
 
+    // Computer plays Black. Evaluation is from White's perspective (positive = White winning).
+    // So Black minimizes the evaluation.
+    int bestValue = 9999;
+    Move bestNextMove = moves[0];
+    int i=0;
+    for (Move& m : moves) {
+        i++;
+        Undo undo;
+        m_position.makeMove(m, undo);
+        if (m.isPromotion()) {
+            printBitboard(m_position.pieces[0][QUEEN]);
+        }
+        int value = minimax(depth - 1, -10000, 10000);  // true = next is White (maximizer)
+        m_position.undoMove(m, undo);
+        if (m.isPromotion()) {
+            printBitboard(m_position.pieces[0][QUEEN]);
+        }
+        if (value < bestValue) {
+            bestValue = value;
+            bestNextMove = m;
+        }
+    }
     return bestNextMove;
-};
-
-int Minimax::minimax(int depth, QList<QList<Square *>> board, int alpha, int beta, bool isMaximisingPlayer) {
-    if (depth == 0) {
-        return BoardEvaluator::evaluateBoard(board);
-    }
-    if (isMaximisingPlayer) {
-        int bestMove = -9999;
-        QHash<Piece *, QList<QList<int>>> newGameMoves = getNextMoves("black");
-        for (int i = 0; i < newGameMoves.count(); i++) {
-            for (int j = 0; j < newGameMoves.values()[i].count(); j++) {
-                Piece * piece = newGameMoves.keys()[i];
-                int row = piece->getRow();
-                int col = piece->getCol();
-                Piece * capturedPiece = Game::makeMove(board, piece, newGameMoves.values()[i][j]);
-                bestMove = std::max(bestMove, minimax(depth - 1, board, alpha, beta, !isMaximisingPlayer));
-                Game::undoMove(board, piece, capturedPiece, row, col);
-                alpha = std::max(alpha, bestMove);
-                if (alpha >= beta) {
-                    return bestMove;
-                }
-            }
-        }
-        return bestMove;
-    } else {
-        int bestMove = 9999;
-        QHash<Piece *, QList<QList<int>>> newGameMoves = getNextMoves("white");
-        for (int i = 0; i < newGameMoves.count(); i++) {
-            for (int j = 0; j < newGameMoves.values()[i].count(); j++) {
-                Piece * piece = newGameMoves.keys()[i];
-                int row = piece->getRow();
-                int col = piece->getCol();
-                Piece * capturedPiece = Game::makeMove(board, piece, newGameMoves.values()[i][j]);
-                bestMove = std::min(bestMove, minimax(depth - 1, board, alpha, beta, !isMaximisingPlayer));
-                Game::undoMove(board, piece, capturedPiece, row, col);
-                beta = std::min(beta, bestMove);
-                if (beta <= alpha) {
-                    return bestMove;
-                }
-            }
-        }
-        return bestMove;
-    }
 }
 
-QHash<Piece *, QList<QList<int>>> Minimax::getNextMoves(QString colour) {
-    QHash<Piece *, QList<QList<int>>> moves;
-    //Get all pieces with at least one move
-    for(int i=0; i != this->board.count(); i ++) {
-        for(int j=0; j != this->board[0].count(); j++) {
-            Piece * piece = this->board[i][j]->getPieceOnSquare()->clone();
-            if (piece->pieceColour() != colour) continue;
-            QList<QList<int>> possibleMoves = Game::getPossibleMoves(this->board, piece->getRow(), piece->getCol());
-            if (possibleMoves.count() > 0) {
-                //Insert move
-                moves.insert(piece, possibleMoves);
-            }
+int Minimax::quiescence(int alpha, int beta, int depth)
+{
+    int stand_pat = BoardEvaluator::evaluateBoard(m_position);
+
+
+
+    if (stand_pat >= beta) {
+        return beta;
+    }
+
+    if (stand_pat > alpha) {
+        alpha = stand_pat;
+    }
+
+    if (depth == 0) {
+        return stand_pat;
+    }
+
+    std::vector<Move> moves = getNextMoves();
+
+    for (Move& m : moves) {
+        if (!m.isCapture())
+            continue;
+
+        Undo undo;
+        m_position.makeMove(m, undo);
+
+        int score = -quiescence(-beta, -alpha, depth -1);
+
+        m_position.undoMove(m, undo);
+
+        if (score >= beta) {
+            return beta;
+        }
+
+        if (score > alpha) {
+            alpha = score;
         }
     }
-    return moves;
+
+    return alpha;
+}
+
+
+
+int Minimax::minimax(int depth, int alpha, int beta)
+{
+    if(depth == 0) {
+        return quiescence(alpha, beta, 1);
+    }
+
+    std::vector<Move> moves = getNextMoves();
+    // Move ordering: captures/promotions first
+    std::sort(moves.begin(), moves.end(), [](const Move& a, const Move& b) {
+        int scoreA = 0;
+        int scoreB = 0;
+
+        if (a.isCapture()) {
+            scoreA = BoardEvaluator::pieceValue(a.captured) - BoardEvaluator::pieceValue(a.piece);
+        }
+
+        if (b.isCapture()) {
+            scoreB = BoardEvaluator::pieceValue(b.captured) - BoardEvaluator::pieceValue(b.piece);
+        }
+
+        return scoreA > scoreB;
+    });
+
+    if(moves.empty()) {
+        Color stm = m_position.sideToMove;
+        if(m_position.inCheck(stm)) return (stm == WHITE ? -10000 : 10000);
+        return 0; // stalemate
+    }
+
+    bool isMax = (m_position.sideToMove == WHITE);
+    if(isMax) {
+        int best = -100000;
+        for(Move& m : moves) {
+            Undo undo;
+            m_position.makeMove(m, undo);
+            int eval = minimax(depth - 1, alpha, beta);
+            m_position.undoMove(m, undo);
+            best = std::max(best, eval);
+            alpha = std::max(alpha, eval);
+            if(beta <= alpha) break;
+        }
+        return best;
+    } else {
+        int best = 100000;
+        for(Move& m : moves) {
+            Undo undo;
+            m_position.makeMove(m, undo);
+            int eval = minimax(depth - 1, alpha, beta);
+            m_position.undoMove(m, undo);
+            best = std::min(best, eval);
+            beta = std::min(beta, eval);
+            if(beta <= alpha) break;
+        }
+        return best;
+    }
 }

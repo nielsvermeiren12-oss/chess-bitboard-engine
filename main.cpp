@@ -6,7 +6,9 @@
 #include <qqml.h>
 #include <QtQuick/qquickitem.h>
 #include <QtQuick/qquickview.h>
-#include "board/boardviewmodel.h"
+#include <domain/movegenerator.h>
+#include <domain/position.h>
+#include <board/boardviewmodel.h>
 
 int main(int argc, char *argv[])
 {
@@ -17,9 +19,9 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
-    BoardViewModel * boardVm = new BoardViewModel();
+    BoardViewModel * boardVm = new BoardViewModel(nullptr);
 
-    engine.rootContext()->setContextProperty("BoardModel", boardVm);
+    engine.rootContext()->setContextProperty("boardModel", boardVm);
 
     const QUrl url(QStringLiteral("qrc:/Board.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

@@ -1,19 +1,25 @@
 #ifndef MINIMAX_H
 #define MINIMAX_H
-#include "pieces/piece.h"
-#include "board/square.h"
-#include "boardevaluator.h"
+
 #include <QHash>
-#include "game/game.h"
+#include <domain/movegenerator.h>
+#include <domain/position.h>
 
 class Minimax {
     public:
-        Minimax(QList<QList<Square *>> board);
-        int minimax(int depth, QList<QList<Square *>> board, int alpha, int beta, bool isMaximizingPlayer);
-        QHash<Piece *, QList<QList<int>>> getNextMoves(QString colour);
-        QHash<Piece *, QList<int>> minimaxRoot(int depth);
+        Minimax(Position& position);
+        Move minimaxRoot(int depth);
+        int minimax(int depth, int alpha, int beta);
+        std::vector<Move> getNextMoves(){
+            std::vector<Move> moves;
+            moves.reserve(256);
+            MoveGenerator generator;
+            generator.generateLegalMoves(m_position, moves);
+            return moves;
+        }
+        int quiescence(int alpha, int beta, int depth);
     private:
-        QList<QList<Square *>> board;
+        Position m_position;
 };
 
 #endif // MINIMAX_H

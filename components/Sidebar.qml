@@ -2,9 +2,9 @@ import QtQuick 2.11
 
 Item {
     Rectangle {
-        x: 8 * 73
+        x: 8 * 64 + 24
         width: 200
-        height: 8*73-3
+        height: 8*64+24
         color: "#111212"
 
         Rectangle {
@@ -40,27 +40,27 @@ Item {
                  onClicked: boardRepeater.resetGame();
             }
         }
-        Text {
-            id: isCheckBlack
-            text: boardRepeater.isCheckBlack ? boardRepeater.isCheckMateBlack ? "CheckMate!" : "Check" : boardRepeater.isStaleMate ? "StaleMate!" : ""
-            color: "white"
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: 200
-            font.bold: true
-        }
-        Text {
-            id: isCheckWhite
-            text: boardRepeater.isCheckWhite ? boardRepeater.isCheckMateWhite ? "CheckMate!" : "Check" : boardRepeater.isStaleMate ? "StaleMate!" : ""
-            color: "white"
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: 368
-            font.bold: true
-        }
+        // Text {
+        //     id: isCheckBlack
+        //     text: boardRepeater.isCheckBlack ? boardRepeater.isCheckMateBlack ? "CheckMate!" : "Check" : boardRepeater.isStaleMate ? "StaleMate!" : ""
+        //     color: "white"
+        //     anchors.horizontalCenter: parent.horizontalCenter
+        //     y: 200
+        //     font.bold: true
+        // }
+        // Text {
+        //     id: isCheckWhite
+        //     text: boardRepeater.isCheckWhite ? boardRepeater.isCheckMateWhite ? "CheckMate!" : "Check" : boardRepeater.isStaleMate ? "StaleMate!" : ""
+        //     color: "white"
+        //     anchors.horizontalCenter: parent.horizontalCenter
+        //     y: 368
+        //     font.bold: true
+        // }
         Text {
             text: "Move calculated in: " + boardRepeater.elapsedTime + " ms"
             color: "white"
             anchors.horizontalCenter: parent.horizontalCenter
-            y: 550
+            y: (8*64+24)/2 + 200
         }
     }
 }

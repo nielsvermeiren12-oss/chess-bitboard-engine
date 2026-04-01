@@ -1,23 +1,16 @@
 #ifndef BOARDEVALUATOR_H
 #define BOARDEVALUATOR_H
-#include "board/square.h"
-#include <algorithm>
+
+#include <domain/position.h>
+
+
+
 class BoardEvaluator {
     public:
         BoardEvaluator();
-        static int evaluateBoard(QList<QList<Square *>> board);
-
-    private:
-        static QList<QList<double>> pawnWhiteTable;
-        static QList<QList<double>> pawnBlackTable;
-        static QList<QList<double>> knightTable;
-        static QList<QList<double>> bishopWhiteTable;
-        static QList<QList<double>> bishopBlackTable;
-        static QList<QList<double>> rookWhiteTable;
-        static QList<QList<double>> rookBlackTable;
-        static QList<QList<double>> queenTable;
-        static QList<QList<double>> kingWhiteTable;
-        static QList<QList<double>> kingBlackTable;
+        static int evaluateBoard(const Position position);
+        static int pieceValue(PieceType piece);
+        static bool isHanging(const Position pos, int sq, Piece piece);
 };
 
 #endif // BOARDEVALUATOR_H
